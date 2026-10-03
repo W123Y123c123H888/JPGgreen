@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<head>
+<meta charset="UTF-8" />
+<title>JPEG图片爆浆</title>
+<meta name="description" content="可以模拟安卓图片偏绿bug" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="JPEGreen" />
+<meta property="og:description" content="安卓曾有一个bug，导致图片加载和保存后略微偏绿。这个网页应用将模拟这一过程。" />
+
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --card-bg: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text-secondary: #64748b;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --accent-disabled: #cbd5e1;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  a:visited {
+    color: var(--accent);
+  }
+
+  /* 顶栏 */
+  .header {
+    padding: 16px 24px;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+    z-index: 10;
+  }
+
+  .header p {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+  }
+
+  .header p:last-child {
+    margin-bottom: 0;
+  }
+
+  .header a {
+    font-weight: 500;
+  }
+
+  /* 工具栏 */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .inlineBlock {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  /* 文件输入 */
+  input[type="file"] {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  input[type="file"]::file-selector-button {
+    padding: 6px 14px;
+    margin-right: 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--card-bg);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  input[type="file"]::file-selector-button:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+  }
+
+  /* 按钮 */
+  button {
+    padding: 7px 18px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--accent);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
+  }
+
+  button:hover:not(:disabled) {
+    background: var(--accent-hover);
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+  }
+
+  button:disabled {
+    background: var(--accent-disabled);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  #saveLink {
+    display: none;
+  }
+
+  /* 内容区：左右对比 */
+  .content {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    min-height: 0;
+    padding: 16px 24px;
+    gap: 16px;
+  }
+
+  .imagePanel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .imagePanelLabel {
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    background: #fafbfc;
+  }
+
+  #origImg, #greenImg {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    flex-grow: 1;
+    min-height: 0;
+    background-color: #f1f5f9;
+  }
+
+  /* 底部控制面板 */
+  .footer {
+    padding: 16px 24px 20px;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.03);
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .controlGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* 数字输入 */
+  input[type="number"] {
+    width: 72px;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--card-bg);
+    color: var(--text);
+    font-size: 14px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    -moz-appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+  }
+
+  input[type="number"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  }
+
+  /* 滑块 */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 160px;
+    height: 6px;
+    border-radius: 3px;
+    background: #e2e8f0;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(59, 130, 246, 0.4);
+    transition: transform 0.15s ease;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border: none;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(59, 130, 246, 0.4);
+  }
+
+  #currentIter, #qualityText {
+    display: inline-block;
+    min-width: 40px;
+    text-align: right;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .footer p:last-child {
+    margin: 12px 0 0 0;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  /* 响应式：窄屏时上下排列 */
+  @media (max-width: 640px) {
+    .content {
+      flex-direction: column;
+      padding: 12px;
+      gap: 12px;
+    }
+
+    .imagePanel {
+      min-height: 200px;
+    }
+
+    .header, .footer {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+    .controls {
+      gap: 16px;
+    }
+
+    input[type="range"] {
+      width: 120px;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <p>安卓曾经<a href="https://y9mcvnu5uk2f.meoo.pub/" target="_blank">有一个bug，导致图片加载和保存后略微偏绿</a>。这个网页应用将模拟这一过程。</p>
+  <div class="toolbar">
+    <span class="inlineBlock">
+      <label for="imageLoader">选择图片：</label>
+      <input type="file" id="imageLoader" accept="image/*" />
+    </span>
+    <span class="inlineBlock">
+      <button id="saveBtn" disabled="disabled">保存结果</button>
+      <a id="saveLink"></a>
+    </span>
+  </div>
+</div>
+
+<div class="content">
+  <div class="imagePanel">
+    <div class="imagePanelLabel">原图</div>
+    <div id="origImg"></div>
+  </div>
+  <div class="imagePanel">
+    <div class="imagePanelLabel">模拟结果</div>
+    <div id="greenImg"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="controls">
+    <div class="controlGroup">
+      <label for="iterbox">迭代次数：</label>
+      <input type="number" id="iterbox" min="0" max="9999" value="16" />
+    </div>
+    <div class="controlGroup">
+      <span>当前：</span>
+      <span id="currentIter">0</span>
+    </div>
+    <div class="controlGroup">
+      <label for="quality">质量：</label>
+      <input type="range" id="quality" min="0" max="101" value="75" />
+      <span id="qualityText">75%</span>
+    </div>
+  </div>
+
+<script language="javascript">
+(() => {
+    "use strict";
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const currentIter = document.getElementById("currentIter");
+    const saveBtn = document.getElementById("saveBtn");
+    const saveLink = document.getElementById("saveLink");
+    const greenImg = document.getElementById("greenImg");
+    const image = new Image();
+    const imageLoader = document.getElementById("imageLoader");
+    const iterBox = document.getElementById("iterbox");
+    const origImg = document.getElementById("origImg");
+    const qualityBox = document.getElementById("quality");
+    const qualityText = document.getElementById("qualityText");
+    const clamp = x => x >= 0 ? x <= 255 ? x : 255 : 0;
+    const clampuv = x => x >= -128 ? x <= 127 ? x : 127 : -128;
+    let curiter = 0;
+    let iter = 16;
+    let quality = 75;
+    let imageName = "image";
+    let imageSrc;
+    const updateInput = () => {
+        let iter = parseInt(iterBox.value);
+        if(Number.isNaN(iter)) {
+            iter = 16;
+        }
+        let quality = parseInt(qualityBox.value);
+        if(Number.isNaN(quality)) {
+            quality = 75;
+        }
+        qualityText.innerText = quality <= 100 ? quality + "%" : "无损";
+        return [iter, quality];
+    }
+    const resetProcess = () => {
+        [iter, quality] = updateInput();
+        saveBtn.disabled = true;
+        curiter = 0;
+        currentIter.innerText = 0;
+        if(imageSrc) {
+            image.src = imageSrc;
+        }
+    }
+    const updateIter = () => {
+        [iter, quality] = updateInput();
+        if(curiter <= iter) {
+            requestAnimationFrame(processImage);
+        } else {
+            resetProcess();
+        }
+    }
+    const processImage = () => {
+        if(curiter == iter) {
+            saveBtn.disabled = false;
+            return;
+        }
+        ++curiter;
+        canvas.width = image.width;
+        canvas.height = image.height;
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, image.width, image.height);
+        ctx.drawImage(image, 0, 0);
+        const imageData = ctx.getImageData(0, 0, image.width, image.height);
+        const data = imageData.data;
+        for(let p = 0; p < data.length/4; ++p) {
+            const r = data[p*4  ];
+            const g = data[p*4+1];
+            const b = data[p*4+2];
+            const y = clamp  ((  77*r + 150*g +  29*b) >> 8);
+            const u = clampuv(((-43*r -  85*g + 128*b) >> 8) - 1);
+            const v = clampuv(((128*r - 107*g -  21*b) >> 8) - 1);
+            const r1 = clamp((65536*y           + 91881*v) >> 16);
+            const g1 = clamp((65536*y - 22553*u - 46802*v) >> 16);
+            const b1 = clamp((65536*y + 116130*u         ) >> 16);
+            data[p*4  ] = r1;
+            data[p*4+1] = g1;
+            data[p*4+2] = b1;
+        }
+        ctx.putImageData(imageData, 0, 0);
+        const dataURL = quality <= 100 ? canvas.toDataURL("image/jpeg", quality * 0.01) : canvas.toDataURL("image/png");
+        greenImg.style.backgroundImage = `url("${dataURL}")`;
+        currentIter.innerText = curiter;
+        image.src = dataURL;
+    }
+    image.addEventListener("load", () => {
+        requestAnimationFrame(processImage);
+    })
+    imageLoader.addEventListener("change", () => {
+        if(imageLoader.files.length != 0) {
+            const file = imageLoader.files[0];
+            imageName = file.name;
+            const reader = new FileReader();
+            reader.addEventListener("load", () => {
+                imageSrc = reader.result;
+                greenImg.style.backgroundImage = origImg.style.backgroundImage = `url("${imageSrc}")`;
+                resetProcess();
+            })
+            reader.readAsDataURL(file);
+        }
+    })
+    saveBtn.addEventListener("click", () => {
+        if(image.src) {
+            const dotIndex = imageName.lastIndexOf(".");
+            saveLink.download = (dotIndex == -1 ? imageName : imageName.substring(0, dotIndex)) + (quality <= 100 ? "_JPEGreen.jpg" : "_JPEGreen.png");
+            saveLink.href = image.src;
+            saveLink.click();
+        }
+    })
+    iterBox.addEventListener("change", updateIter);
+    iterBox.addEventListener("input", updateInput);
+    qualityBox.addEventListener("change", resetProcess);
+    qualityBox.addEventListener("input", updateInput);
+})();
+</script>
+</body>
+</html>
