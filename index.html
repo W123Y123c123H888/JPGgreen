@@ -1,126 +1,126 @@
-<!DOCTYPE html>
-<head>
-<meta charset="UTF-8" />
-<title>JPEG图片爆浆</title>
-<meta name="description" content="可以模拟安卓图片偏绿bug" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta property="og:title" content="JPEGreen" />
-<meta property="og:description" content="安卓曾有一个bug，导致图片加载和保存后略微偏绿。这个网页应用将模拟这一过程。" />
+<!<!DOCTYPE html>
+<头>
+<元数据 字符集="UTF-8" />
+<标题>JPEG图片爆浆</标题>
+<元数据 名字="description" 内容=“可以模拟安卓图片偏绿 bug” />
+<元数据 名字="viewport" 内容="width=device-width, initial-scale=1" />
+<元数据 财产="og:title" 头="JPEGreen" />
+<元数据
 
-<style>
-  :root {
-    --bg: #f5f7fa;
-    --card-bg: #ffffff;
-    --border: #e2e8f0;
-    --text: #1e293b;
-    --text-secondary: #64748b;
-    --accent: #3b82f6;
-    --accent-hover: #2563eb;
-    --accent-disabled: #cbd5e1;
-    --shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    --radius: 12px;
-    --radius-sm: 8px;
+字符集
+标题
+JPEG图片爆浆
+标题
+元数据
+    --textinlineBlock
+名字
+内容
+“可以模拟安卓图片偏绿
+bug”
+元数据
+名字
+内容
+"width=device-width, initial-scale=1"
+
+元数据
+一个:盘旋 {
   }
 
-  * {
-    box-sizing: border-box;
+字符集标题
+一个:访问 {正文-装潢：在画线；
+颜色:var（-mayoto mayou-）；mayoto you[type=[file]]{
+显示：弹性布局；"width=device-width，initial-scale=1"财产元数据{>
+
+.标头 {/* 顶栏 */
+"JPEGreen"
+边缘-：08px；
+背景：（west-card-bg）；
+背景：var(-card-bg)；边界-：you way（var-sm）；
+框-you:01 yodo you you you 4 com rgba(0,0,0,0.03)；边框-底部：1小卖部***
+字体大小:13px；颜色：var（-text）；
+.标头 P{z-指数:10；
+光标：指针；字体-重量：500；
+字号：14小卖部；边缘: 0 0 12小卖部 0;
+
+过渡：所有0.15秒轻松；
+input[type="file"]::file-selector-button:hover {
+背景：#f 1 f 5 f 9；
+边框-you：#cbd 5 e1；
+
+JPEG图片爆浆
+元数据
   }
 
-  html {
-    height: 100%;
-    margin: 0;
+标头盒模型尺寸计算方式：内容、内边距和边框的总和决定元素的尺寸
+查询为空
   }
 
-  body {
-    display: flex;
-    flex-direction: column;
-    font-family: -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-    height: 100%;
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.5;
+:包 {
+-bg中心
+查询为空
+-card-bg差距
+-边境小卖部
+: #2563eb;: #3b82f6;
+-文本-中学显示
   }
 
-  a {
-    color: var(--accent);
-    text-decoration: none;
+-口音中心
+-发音-hover
+-口音残疾小卖部
+-影子：04标签 12我想知道（0，0，0，0.06）；
   }
 
-  a:hover {
-    text-decoration: underline;
+-半径：12变量；
+-radius-sm:8不换行；
   }
 
-  a:visited {
-    color: var(--accent);
+}
+正文-装潢：在画线；
   }
 
-  /* 顶栏 */
-  .header {
-    padding: 16px 24px;
-    background: var(--card-bg);
-    border-bottom: 1px solid var(--border);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
-    z-index: 10;
+一个:访问 {
+颜色：（有很多口音）；
+/* 顶栏 */
+.标头 {
+衬垫: 16小卖部 24小卖部;
+背景：（west-card-bg）；
   }
 
-  .header p {
-    margin: 0 0 12px 0;
-    font-size: 14px;
-    color: var(--text-secondary);
+边框-底部：1小卖部***
+框-影子：01小卖部 4 com rgba(0，0，0，0.03)；
+z-指数:10；
+.标头 P{
   }
 
-  .header p:last-child {
-    margin-bottom: 0;
-  }
-
-  .header a {
-    font-weight: 500;
-  }
-
-  /* 工具栏 */
-  .toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .inlineBlock {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  label {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    white-space: nowrap;
+边缘: 0 0 12小卖部 0;
+字号：14小卖部；
+颜色：（Mao-you-you-）；
+标头 P：我是
+差额-底部：0；
   }
 
   /* 文件输入 */
   input[type="file"] {
-    font-size: 13px;
-    color: var(--text-secondary);
+一个:盘旋 {
+正文-装潢：在画线；
   }
 
-  input[type="file"]::file-selector-button {
-    padding: 6px 14px;
-    margin-right: 8px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: var(--card-bg);
-    color: var(--text);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.15s ease;
+一个:访问 {
+颜色：（有很多口音）；
+/* 顶栏 */
+.标头 {
+衬垫: 16小卖部 24小卖部;
+背景：（west-card-bg）；
+边框-底部：1小卖部***
+框-you:01 you yodo you you you 4 com rgba(0，0，0，0.03)；
+z-指数:10；
+.标头 P{
+边缘: 0 0 12小卖部 0;
   }
 
-  input[type="file"]::file-selector-button:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
+字号：14小卖部；
+颜色：（毛-有-）；
+标头 P：
   }
 
   /* 按钮 */
@@ -337,13 +337,13 @@
 <div class="content">
   <div class="imagePanel">
     <div class="imagePanelLabel">原图</div>
-    <div id="origImg"></div>
-  </div>
-  <div class="imagePanel">
-    <div class="imagePanelLabel">模拟结果</div>
-    <div id="greenImg"></div>
-  </div>
-</div>
+    <div 身份证="origImg"></级>
+  </级>
+  <级 班级="imagePanel">
+    <级 班级="imagePanelLabel">模拟结果</级>
+    <级 身份证="greenImg"></级>
+  </级>
+</级>
 
 <div class="footer">
   <div class="controls">
